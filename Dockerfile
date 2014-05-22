@@ -1,20 +1,16 @@
 ##
-# homme/gdal:latest
+# homme/gdal
 #
-# This creates an Ubuntu derived base image that installs the latest
-# GDAL github checkout compiled with a broad range of drivers.  The
-# build process closely follows that defined in
-# <https://github.com/OSGeo/gdal/blob/trunk/.travis.yml> but omits
-# Java support.
+# This creates an Ubuntu derived base image that installs the latest GDAL
+# subversion checkout compiled with a broad range of drivers.  The build
+# process closely follows that defined in
+# <https://github.com/OSGeo/gdal/blob/trunk/.travis.yml> but omits Java
+# support.
 #
 
 FROM ubuntu:quantal
 
 MAINTAINER Homme Zwaagstra <hrz@geodata.soton.ac.uk>
-
-# Because docker replaces /sbin/init: https://github.com/dotcloud/docker/issues/1024 
-RUN dpkg-divert --local --rename --add /sbin/initctl && \
-    ln -s /bin/true /sbin/initctl
 
 # Ensure the package repository is up to date
 RUN echo "deb http://archive.ubuntu.com/ubuntu quantal main universe" > /etc/apt/sources.list
@@ -26,7 +22,7 @@ RUN apt-get install -y \
     python-software-properties \
     build-essential \
     wget \
-    git-core
+    subversion
 
 # Install the ubuntu gis repository
 RUN add-apt-repository -y ppa:ubuntugis/ubuntugis-unstable
@@ -34,7 +30,7 @@ RUN add-apt-repository -y ppa:marlam/gta
 RUN apt-get update
 
 # a mounted file systems table to make MySQL happy
-RUN cat /proc/mounts > /etc/mtab
+#RUN cat /proc/mounts > /etc/mtab
 
 # Install gdal dependencies provided by Ubuntu repositories
 RUN apt-get install -y \
@@ -78,6 +74,7 @@ ADD ./install-gdal-deps.sh /usr/local/bin/
 RUN sh /usr/local/bin/install-gdal-deps.sh
 
 # Install GDAL itself
+ADD ./tag.txt /usr/local/share/gdal-tag.txt
 ADD ./install-gdal.sh /usr/local/bin/
 RUN sh /usr/local/bin/install-gdal.sh
 

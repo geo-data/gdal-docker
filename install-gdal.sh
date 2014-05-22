@@ -4,8 +4,11 @@
 # Obtain, configure and install GDAL
 #
 
+tag=`cat /usr/local/share/gdal-tag.txt`
+
 # Checkout GDAL from github
-git clone --depth=0 https://github.com/OSGeo/gdal/ /usr/local/src/gdal
+cd /
+svn checkout "https://svn.osgeo.org/gdal/tags/${tag}/" /usr/local/src/gdal
 
 # Configure GDAL
 cd /usr/local/src/gdal/gdal
