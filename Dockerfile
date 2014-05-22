@@ -74,7 +74,7 @@ ADD ./install-gdal-deps.sh /usr/local/bin/
 RUN sh /usr/local/bin/install-gdal-deps.sh
 
 # Install GDAL itself
-ADD ./tag.txt /usr/local/share/gdal-tag.txt
+ADD ./checkout.txt /usr/local/share/gdal-checkout.txt
 ADD ./install-gdal.sh /usr/local/bin/
 RUN sh /usr/local/bin/install-gdal.sh
 
