@@ -67,7 +67,8 @@ RUN apt-get install -y \
     libgta-dev \
     liblcms2-2 \
     libpcre3-dev \
-    python-dev
+    python-dev \
+    sudo
 
 # Install the GDAL source dependencies
 ADD ./install-gdal-deps.sh /usr/local/bin/
