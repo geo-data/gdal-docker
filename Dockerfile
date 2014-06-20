@@ -71,13 +71,16 @@ RUN apt-get install -y \
     sudo
 
 # Install the GDAL source dependencies
-ADD ./install-gdal-deps.sh /usr/local/bin/
-RUN sh /usr/local/bin/install-gdal-deps.sh
+ADD ./install-gdal-deps.sh /tmp/
+RUN sh /tmp/install-gdal-deps.sh
 
 # Install GDAL itself
-ADD ./checkout.txt /usr/local/share/gdal-checkout.txt
-ADD ./install-gdal.sh /usr/local/bin/
-RUN sh /usr/local/bin/install-gdal.sh
+ADD ./gdal-checkout.txt /tmp/gdal-checkout.txt
+ADD ./install-gdal.sh /tmp/
+RUN sh /tmp/install-gdal.sh
+
+# Clean up APT when done.
+RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Run the GDAL test suite by default
-CMD cd /usr/local/src/gdal/autotest && ./run_all.py
+CMD cd /usr/local/share/gdal-autotest && ./run_all.py
