@@ -8,13 +8,15 @@
 # support.
 #
 
+# Ubuntu 12.10
 FROM ubuntu:quantal
 
 MAINTAINER Homme Zwaagstra <hrz@geodata.soton.ac.uk>
 
 # Ensure the package repository is up to date
 RUN echo "deb http://archive.ubuntu.com/ubuntu quantal main universe" > /etc/apt/sources.list
-RUN apt-get update
+RUN sed -i -e 's/archive.ubuntu.com/old-releases.ubuntu.com/g' /etc/apt/sources.list
+RUN apt-get update -y
 
 # Install basic dependencies
 RUN apt-get install -y \
