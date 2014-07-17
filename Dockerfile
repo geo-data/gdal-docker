@@ -29,7 +29,7 @@ RUN apt-get install -y \
 # Install the ubuntu gis repository
 RUN add-apt-repository -y ppa:ubuntugis/ubuntugis-unstable
 RUN add-apt-repository -y ppa:marlam/gta
-RUN apt-get update
+RUN apt-get update -y
 
 # a mounted file systems table to make MySQL happy
 #RUN cat /proc/mounts > /etc/mtab
@@ -75,6 +75,18 @@ RUN apt-get install -y \
 # Install the GDAL source dependencies
 ADD ./install-gdal-deps.sh /tmp/
 RUN sh /tmp/install-gdal-deps.sh
+
+# Install mozjpeg (see http://blarg.co.uk/blog/how-to-install-mozjpeg)
+RUN apt-get install -y autoconf automake libtool nasm make
+RUN cd /tmp/ && \
+    wget --no-verbose https://github.com/mozilla/mozjpeg/archive/v2.0.1.tar.gz && \
+    tar -xzf v2.0.1.tar.gz && \
+    cd mozjpeg-2.0.1 && \
+    autoreconf -fi && \
+    mkdir build && cd build && \
+    ../configure --prefix=/usr/local && \
+    make install && \
+    ldconfig
 
 # Install GDAL itself
 ADD ./gdal-checkout.txt /tmp/gdal-checkout.txt

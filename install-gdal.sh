@@ -16,6 +16,7 @@ cd /tmp/gdal/gdal && \
     --without-libtool \
     --enable-debug \
     --with-jpeg12 \
+    --with-jpeg=/usr/local \
     --with-python \
     --with-poppler \
     --with-podofo \
