@@ -8,6 +8,7 @@
 service postgresql start || exit 1
 sudo -u postgres psql -c "create database autotest" || exit 1
 sudo -u postgres psql -c "create extension postgis" -d autotest || exit 1
+sudo -u postgres psql -c "create extension postgis_topology" -d autotest || exit 1
 
 # Set up mysql
 mysqld_safe || exit 1 &         # fire up the server

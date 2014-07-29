@@ -8,14 +8,12 @@
 # support.
 #
 
-# Ubuntu 12.10
-FROM ubuntu:quantal
+# Ubuntu 13.10
+FROM ubuntu:saucy
 
 MAINTAINER Homme Zwaagstra <hrz@geodata.soton.ac.uk>
 
 # Ensure the package repository is up to date
-RUN echo "deb http://archive.ubuntu.com/ubuntu quantal main universe" > /etc/apt/sources.list
-RUN sed -i -e 's/archive.ubuntu.com/old-releases.ubuntu.com/g' /etc/apt/sources.list
 RUN apt-get update -y
 
 # Install basic dependencies
@@ -29,7 +27,17 @@ RUN apt-get install -y \
 # Install the ubuntu gis repository
 RUN add-apt-repository -y ppa:ubuntugis/ubuntugis-unstable
 RUN add-apt-repository -y ppa:marlam/gta
-RUN apt-get update
+
+# Install postgis (see http://trac.osgeo.org/postgis/wiki/UsersWikiPostGIS21UbuntuPGSQL93Apt)
+RUN sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt/ precise-pgdg main" >> /etc/apt/sources.list'
+RUN wget --quiet -O - http://apt.postgresql.org/pub/repos/apt/ACCC4CF8.asc | apt-key add -
+
+RUN apt-get update -y
+
+RUN apt-get install -y \
+    postgresql-9.3 \
+    postgresql-9.3-postgis \
+    postgresql-contrib
 
 # a mounted file systems table to make MySQL happy
 #RUN cat /proc/mounts > /etc/mtab
@@ -39,8 +47,6 @@ RUN apt-get install -y \
     mysql-server \
     mysql-client \
     python-numpy \
-    postgis \
-    postgresql-9.1-postgis-2.0-scripts \
     libpq-dev \
     libpng12-dev \
     libjpeg-dev \
