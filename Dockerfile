@@ -18,6 +18,7 @@ RUN apt-get update -y
 
 # Install basic dependencies
 RUN apt-get install -y \
+    apt-utils \
     software-properties-common \
     python-software-properties \
     build-essential \
