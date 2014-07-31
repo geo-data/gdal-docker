@@ -16,9 +16,12 @@ MAINTAINER Homme Zwaagstra <hrz@geodata.soton.ac.uk>
 # Ensure the package repository is up to date
 RUN apt-get update -y
 
+# Temporarily hack around a docker build issue. See
+# <https://github.com/docker/docker/issues/6345#issuecomment-49245365>.
+RUN ln -s -f /bin/true /usr/bin/chfn
+
 # Install basic dependencies
 RUN apt-get install -y \
-    apt-utils \
     software-properties-common \
     python-software-properties \
     build-essential \
