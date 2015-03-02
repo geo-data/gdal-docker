@@ -55,5 +55,12 @@ RUN sh /tmp/test-gdal.sh
 # Clean up APT when done.
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-# Print out version and format support by default
+# Externally accessible data is by default put in /data
+WORKDIR /data
+VOLUME ["/data"]
+
+# Execute the gdal utilities as nobody, not root
+USER nobody
+
+# Output version and capabilities by default.
 CMD gdalinfo --version && gdalinfo --formats && ogrinfo --formats
