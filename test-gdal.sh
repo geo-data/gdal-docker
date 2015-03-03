@@ -25,11 +25,11 @@ cd /tmp/gdal/gdal || die
 
 # Perl unit tests
 cd swig/perl || die
-make test || die
+make test
 cd ../.. || die
 # Java unit tests
 cd swig/java || die
-make test || die
+make test
 cd ../.. || die
 # CPP unit tests
 cd ../autotest || die
