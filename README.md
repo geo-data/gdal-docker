@@ -38,8 +38,8 @@ container, and you have mapped the current working directory on your host to
 `/data`.
 
 GDAL will be run under user `nobody` in the container, so if editing or creating
-files the appropriate permissionss for that user must be applied to the
-directory pointed to by `$(pwd)`.
+files the appropriate permissions for that user must be applied to the directory
+pointed to by `$(pwd)`.
 
 Note that the image tagged `latest`, GDAL represents the latest code *at the
 time the image was built*. If you want to include the most up-to-date commits
