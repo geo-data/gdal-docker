@@ -67,6 +67,10 @@ make install || die
 cd ../.. || die
 ldconfig || die
 
+# Remove packaged GDAL.  This is an older version which can cause conflicts with
+# the newer install.
+apt-get remove -y libgdal-dev libgdal1h
+
 # Stop previously started services.
 service mysql stop
 service postgresql stop
