@@ -4,8 +4,8 @@ NB: As of GDAL version 1.11.2 the image has been renamed from `homme/gdal` to
 `geodata/gdal`.
 
 This is an Ubuntu derived image containing the Geospatial Data Abstraction
-Library (GDAL) compiled with a broad range of drivers. The build process
-closely follows that defined in the
+Library (GDAL) compiled with a broad range of drivers. The build process is
+based on that defined in the
 [GDAL TravisCI tests](https://github.com/OSGeo/gdal/blob/trunk/.travis.yml).
 
 Each branch in the git repository corresponds to a supported GDAL version
@@ -39,7 +39,7 @@ container, and you have mapped the current working directory on your host to
 
 GDAL will be run under user `nobody` in the container, so if editing or creating
 files the appropriate permissions for that user must be applied to the directory
-pointed to by `$(pwd)`.
+pointed to by `$(pwd)`.  Alternatively pass the `--user` option to `docker run`.
 
 Note that the image tagged `latest`, GDAL represents the latest code *at the
 time the image was built*. If you want to include the most up-to-date commits
