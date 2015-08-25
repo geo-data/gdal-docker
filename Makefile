@@ -10,6 +10,12 @@
 # (https://github.com/OSGeo/gdal/blob/trunk/.travis.yml).
 #
 
+# If grass support is required set the variable WITH_GRASS to the GRASS install
+# directory.
+ifdef WITH_GRASS
+USE_GRASS := "--with-grass=$(WITH_GRASS)"
+endif
+
 # Version related variables.
 GDAL_VERSION := $(shell cat ./gdal-checkout.txt)
 OPENJPEG_DOWNLOAD := install-openjpeg-2.0.0-ubuntu12.04-64bit.tar.gz
@@ -29,7 +35,7 @@ DEPS_PACKAGES := python-numpy python-dev libpq-dev libpng12-dev libjpeg-dev libg
 MONGO_PACKAGES := libboost-regex-dev libboost-system-dev libboost-thread-dev libboost-regex1.55.0 libboost-system1.55.0 libboost-thread1.55.0
 
 # GDAL dependency targets.
-GDAL_CONFIG := /usr/local/bin/gdal_config
+GDAL_CONFIG := /usr/local/bin/gdal-config
 BUILD_ESSENTIAL := /usr/share/build-essential
 MONGO_DEV := /usr/local/include/mongo
 MONGO_DEPS := /usr/include/boost/shared_ptr.hpp # Mongo runtime dependencies.
@@ -53,6 +59,7 @@ SCONS := /usr/bin/scons
 ANT := /usr/bin/ant
 ADD_APT_REPOSITORY := /usr/bin/add-apt-repository
 
+# Number of processors available.
 NPROC := $(shell nproc)
 
 install: $(GDAL_CONFIG)
@@ -80,7 +87,7 @@ $(GDAL_CONFIG): /tmp/gdal $(MONGO_DEV) $(OPENJPEG_DEV) $(FILEGDBAPI_DEV) $(LIBEC
 		--with-fgdb=/usr/local \
 		--with-libkml \
 		--with-openjpeg=/usr/local \
-		--with-mongocxx=/usr/local \
+		--with-mongocxx=/usr/local $(USE_GRASS) \
 	&& make -j$(NPROC) \
 	&& cd swig/java \
 	&& sed -i "s/JAVA_HOME =.*/JAVA_HOME = \/usr\/lib\/jvm\/java-7-openjdk-amd64\//" java.opt \
@@ -207,7 +214,7 @@ $(ADD_APT_REPOSITORY): /tmp/apt-updated
 	&& touch -c $(ADD_APT_REPOSITORY)
 
 /tmp/apt-updated:
-	apt-get update -y && touch -c /tmp/apt-updated
+	apt-get update -y && touch /tmp/apt-updated
 
 # Remove build time dependencies.
 clean:
