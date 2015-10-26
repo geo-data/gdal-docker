@@ -7,10 +7,9 @@
 # <https://github.com/OSGeo/gdal/blob/trunk/.travis.yml>
 #
 
-# Ubuntu 14.04 Trusty Tahyr
-FROM ubuntu:trusty
+FROM debian:jessie
 
-MAINTAINER Homme Zwaagstra <hrz@geodata.soton.ac.uk>
+MAINTAINER Geometalab <geometalab@hsr.ch>
 
 # Install the application.
 ADD . /usr/local/src/gdal-docker/

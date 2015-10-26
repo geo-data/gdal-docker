@@ -30,7 +30,7 @@ MDBSQLITE_DIR := mdb-sqlite-1.0.2
 MDBSQLITE_DOWNLOAD := $(MDBSQLITE_DIR).tar.bz2
 
 # Dependencies satisfied by packages.
-DEPS_PACKAGES := python-numpy python-dev libpq-dev libpng12-dev libjpeg-dev libgif-dev liblzma-dev libgeos-dev libcurl4-gnutls-dev libproj-dev libxml2-dev libexpat-dev libxerces-c-dev libnetcdf-dev netcdf-bin libpoppler-dev libspatialite-dev gpsbabel swig libhdf4-alt-dev libpodofo-dev poppler-utils libfreexl-dev unixodbc-dev libwebp-dev libepsilon-dev libgta-dev liblcms2-2 libpcre3-dev
+DEPS_PACKAGES := python-numpy python-dev libpq-dev libpng12-dev libjpeg-dev libgif-dev liblzma-dev libgeos-dev libcurl4-gnutls-dev libproj-dev libxml2-dev libexpat-dev libxerces-c-dev libnetcdf-dev netcdf-bin libpoppler-dev libspatialite-dev gpsbabel swig libhdf4-alt-dev libpodofo-dev poppler-utils libfreexl-dev unixodbc-dev libwebp-dev libepsilon-dev liblcms2-2 libpcre3-dev libhdf5-dev
 # Packages required by mongo.
 MONGO_PACKAGES := libboost-regex-dev libboost-system-dev libboost-thread-dev libboost-regex1.55.0 libboost-system1.55.0 libboost-thread1.55.0
 
@@ -43,10 +43,8 @@ OPENJPEG_DEV := /usr/local/include/openjpeg-2.0
 FILEGDBAPI_DEV := /usr/local/include/FileGDBAPI.h
 LIBECWJ2_DEV := /usr/local/include/NCSECWClient.h
 MRSID_DEV := /usr/local/include/lt_base.h
-LIBHDF5_DEV := /usr/include/H5Cpp.h
+LIBHDF5_DEV := /usr/include/hdf5/serial/H5Cpp.h
 LIBKEA_DEV := /usr/lib/libkea.so
-MDBSQLITE_DEV := $(JAVA)/jre/lib/ext/sqlitejdbc-v048-nested.jar
-JAVA := /usr/lib/jvm/java-7-openjdk-amd64
 DEPS_DEV := /usr/include/numpy	# Represents all dependency packages.
 
 # Build tools.
@@ -64,7 +62,7 @@ NPROC := $(shell nproc)
 
 install: $(GDAL_CONFIG)
 
-$(GDAL_CONFIG): /tmp/gdal $(MONGO_DEV) $(OPENJPEG_DEV) $(FILEGDBAPI_DEV) $(LIBECWJ2_DEV) $(MRSID_DEV) $(LIBKML_DEV) $(LIBKEA_DEV) $(MDBSQLITE_DEV) $(JAVA) $(DEPS_DEV) $(ANT)
+$(GDAL_CONFIG): /tmp/gdal $(MONGO_DEV) $(OPENJPEG_DEV) $(FILEGDBAPI_DEV) $(LIBECWJ2_DEV) $(MRSID_DEV) $(LIBKML_DEV) $(LIBKEA_DEV) $(MDBSQLITE_DEV) $(DEPS_DEV) $(ANT)
 	cd /tmp/gdal/gdal \
 	&& ./configure \
 		--prefix=/usr/local \
@@ -76,9 +74,6 @@ $(GDAL_CONFIG): /tmp/gdal $(MONGO_DEV) $(OPENJPEG_DEV) $(FILEGDBAPI_DEV) $(LIBEC
 		--with-mysql \
 		--with-liblzma \
 		--with-webp \
-		--with-java \
-		--with-mdb \
-		--with-jvm-lib-add-rpath \
 		--with-epsilon \
 		--with-gta \
 		--with-ecw=/usr/local \
@@ -89,10 +84,7 @@ $(GDAL_CONFIG): /tmp/gdal $(MONGO_DEV) $(OPENJPEG_DEV) $(FILEGDBAPI_DEV) $(LIBEC
 		--with-openjpeg=/usr/local \
 		--with-mongocxx=/usr/local $(USE_GRASS) \
 	&& make -j$(NPROC) \
-	&& cd swig/java \
-	&& sed -i "s/JAVA_HOME =.*/JAVA_HOME = \/usr\/lib\/jvm\/java-7-openjdk-amd64\//" java.opt \
-	&& make -j$(NPROC) \
-	&& cd ../../swig/perl \
+	&& cd ./swig/perl \
 	&& make generate \
 	&& make -j$(NPROC) \
 	&& cd ../.. \
@@ -155,7 +147,7 @@ $(LIBKML_DEV): /tmp/$(LIBKML_DOWNLOAD)
 $(LIBKEA_DEV): /tmp/$(LIBKEA_DOWNLOAD) $(LIBHDF5_DEV) $(UNZIP) $(CMAKE)
 	$(UNZIP) -o -d /tmp /tmp/$(LIBKEA_DOWNLOAD) \
 	&& cd /tmp/chchrsc-kealib-$(LIBKEA_VERSION)/trunk \
-	&& cmake . -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr -DHDF5_INCLUDE_DIR=/usr/include -DHDF5_LIB_PATH=/usr/lib -DLIBKEA_WITH_GDAL=OFF \
+	&& cmake . -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr -DHDF5_INCLUDE_DIR=/usr/include/hdf5/serial -DHDF5_LIB_PATH=/usr/lib/x86_64-linux-gnu/hdf5/serial -DLIBKEA_WITH_GDAL=OFF \
 	&& make -j$(NPROC) \
 	&& make install \
 	&& ldconfig
@@ -165,17 +157,7 @@ $(LIBKEA_DEV): /tmp/$(LIBKEA_DOWNLOAD) $(LIBHDF5_DEV) $(UNZIP) $(CMAKE)
 $(LIBHDF5_DEV): /tmp/apt-updated
 	apt-get install -y libhdf5-serial-dev && touch -c $(LIBHDF5_DEV)
 
-$(MDBSQLITE_DEV): /tmp/$(MDBSQLITE_DOWNLOAD) $(JAVA)
-	tar -C /tmp -xjf /tmp/$(MDBSQLITE_DOWNLOAD) \
-	&& cp /tmp/$(MDBSQLITE_DIR)/lib/*.jar $(JAVA)/jre/lib/ext
-/tmp/$(MDBSQLITE_DOWNLOAD): $(WGET)
-	$(WGET) --no-verbose http://mdb-sqlite.googlecode.com/files/$(MDBSQLITE_DOWNLOAD) -O /tmp/$(MDBSQLITE_DOWNLOAD) \
-	&& touch -c /tmp/$(MDBSQLITE_DOWNLOAD)
-
-$(JAVA): /tmp/apt-updated
-	apt-get install -y openjdk-7-jdk && touch -c $(JAVA)
-
-$(DEPS_DEV): /etc/apt/sources.list.d/ubuntugis-ubuntugis-unstable-trusty.list /etc/apt/sources.list.d/marlam-gta-trusty.list
+$(DEPS_DEV):
 	apt-get install -y $(DEPS_PACKAGES) && touch -c $(DEPS_DEV)
 
 $(SVN): /tmp/apt-updated
@@ -202,12 +184,6 @@ $(ANT): /tmp/apt-updated
 $(BUILD_ESSENTIAL): /tmp/apt-updated
 	apt-get install -y build-essential \
 	&& touch -c $(BUILD_ESSENTIAL)
-
-/etc/apt/sources.list.d/ubuntugis-ubuntugis-unstable-trusty.list: /usr/bin/add-apt-repository
-	add-apt-repository -y ppa:ubuntugis/ubuntugis-unstable && apt-get update -y
-
-/etc/apt/sources.list.d/marlam-gta-trusty.list: /usr/bin/add-apt-repository
-	add-apt-repository -y ppa:marlam/gta && apt-get update -y
 
 $(ADD_APT_REPOSITORY): /tmp/apt-updated
 	apt-get install -y software-properties-common \
