@@ -1,9 +1,6 @@
 # GDAL Docker Images
 
-NB: As of GDAL version 1.11.2 the image has been renamed from `homme/gdal` to
-`geodata/gdal`.
-
-This is an Ubuntu derived image containing the Geospatial Data Abstraction
+This is an Debian derived image containing the Geospatial Data Abstraction
 Library (GDAL) compiled with a broad range of drivers. The build process is
 based on that defined in the
 [GDAL TravisCI tests](https://github.com/OSGeo/gdal/blob/trunk/.travis.yml).
@@ -12,6 +9,9 @@ Each branch in the git repository corresponds to a supported GDAL version
 (e.g. `1.11.2`) with the master branch following GDAL master. These branch names
 are reflected in the image tags on the Docker Index (e.g. branch `1.11.2`
 corresponds to the image `geodata/gdal:1.11.2`).
+
+In contrast to the Ubuntu based `geodata/gdal` image, there
+is no support for `libgta` and `MDB` (no Java).
 
 ## Usage
 
