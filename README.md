@@ -1,3 +1,5 @@
+[![Stories in Ready](https://badge.waffle.io/geometalab/gdal-docker.svg?label=ready&title=Ready)](http://waffle.io/geometalab/gdal-docker)
+
 # GDAL Docker Images
 
 NB: As of GDAL version 1.11.2 the image has been renamed from `homme/gdal` to
