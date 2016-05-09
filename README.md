@@ -1,3 +1,4 @@
+[![Circle CI](https://circleci.com/gh/geometalab/gdal-docker.svg?style=svg)](https://circleci.com/gh/geometalab/gdal-docker)
 [![Stories in Ready](https://badge.waffle.io/geometalab/gdal-docker.svg?label=ready&title=Ready)](http://waffle.io/geometalab/gdal-docker)
 
 # GDAL Docker Images
