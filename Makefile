@@ -23,14 +23,13 @@ FILEGDBAPI_DOWNLOAD := FileGDB_API_1_2-64.tar.gz
 LIBECWJ2_DOWNLOAD := install-libecwj2-ubuntu12.04-64bit.tar.gz
 MRSID_DIR = MrSID_DSDK-8.5.0.3422-linux.x86-64.gcc44
 MRSID_DOWNLOAD := $(MRSID_DIR).tar.gz
-LIBKML_DOWNLOAD := install-libkml-r864-64bit.tar.gz
 LIBKEA_VERSION := c6d36f3db5e4
 LIBKEA_DOWNLOAD := $(LIBKEA_VERSION).zip
 MDBSQLITE_DIR := mdb-sqlite-1.0.2
 MDBSQLITE_DOWNLOAD := $(MDBSQLITE_DIR).tar.bz2
 
 # Dependencies satisfied by packages.
-DEPS_PACKAGES := python-numpy python-dev libpq-dev libpng12-dev libjpeg-dev libgif-dev liblzma-dev libgeos-dev libcurl4-gnutls-dev libproj-dev libxml2-dev libexpat-dev libxerces-c-dev libnetcdf-dev netcdf-bin libpoppler-dev libspatialite-dev gpsbabel swig libhdf4-alt-dev libpodofo-dev poppler-utils libfreexl-dev unixodbc-dev libwebp-dev libepsilon-dev libgta-dev liblcms2-2 libpcre3-dev
+DEPS_PACKAGES := python-numpy python-dev libpq-dev libpng12-dev libjpeg-dev libgif-dev liblzma-dev libgeos-dev libcurl4-gnutls-dev libproj-dev libxml2-dev libexpat-dev libxerces-c-dev libnetcdf-dev netcdf-bin libpoppler-dev libspatialite-dev gpsbabel swig libhdf4-alt-dev libpodofo-dev poppler-utils libfreexl-dev unixodbc-dev libwebp-dev libepsilon-dev libgta-dev liblcms2-2 libpcre3-dev libkml-dev ca-certificates
 # Packages required by mongo.
 MONGO_PACKAGES := libboost-regex-dev libboost-system-dev libboost-thread-dev libboost-regex1.55.0 libboost-system1.55.0 libboost-thread1.55.0
 
@@ -58,13 +57,14 @@ GIT := /usr/bin/git
 SCONS := /usr/bin/scons
 ANT := /usr/bin/ant
 ADD_APT_REPOSITORY := /usr/bin/add-apt-repository
+APT_INSTALL_OPTS := -y --no-install-recommends
 
 # Number of processors available.
 NPROC := $(shell nproc)
 
 install: $(GDAL_CONFIG)
 
-$(GDAL_CONFIG): /tmp/gdal $(MONGO_DEV) $(OPENJPEG_DEV) $(FILEGDBAPI_DEV) $(LIBECWJ2_DEV) $(MRSID_DEV) $(LIBKML_DEV) $(LIBKEA_DEV) $(MDBSQLITE_DEV) $(JAVA) $(DEPS_DEV) $(ANT)
+$(GDAL_CONFIG): /tmp/gdal $(DEPS_DEV) $(MONGO_DEV) $(OPENJPEG_DEV) $(FILEGDBAPI_DEV) $(LIBECWJ2_DEV) $(MRSID_DEV) $(LIBKEA_DEV) $(MDBSQLITE_DEV) $(JAVA) $(ANT)
 	cd /tmp/gdal/gdal \
 	&& ./configure \
 		--prefix=/usr/local \
@@ -108,7 +108,7 @@ $(MONGO_DEV): $(GIT) $(SCONS) $(MONGO_DEPS)
 	&& cd /tmp/mongo-cxx-driver \
 	&& $(SCONS) --prefix=/usr/local --sharedclient install
 $(MONGO_DEPS): /tmp/apt-updated
-	apt-get install -y $(MONGO_PACKAGES) && touch -c $(MONGO_DEPS)
+	apt-get install $(APT_INSTALL_OPTS) $(MONGO_PACKAGES) && touch -c $(MONGO_DEPS)
 
 $(OPENJPEG_DEV): /tmp/$(OPENJPEG_DOWNLOAD)
 	tar -C /tmp -xzf /tmp/$(OPENJPEG_DOWNLOAD) \
@@ -144,14 +144,6 @@ $(MRSID_DEV): /tmp/$(MRSID_DOWNLOAD)
 	$(WGET) --no-verbose http://s3.amazonaws.com/etc-data.koordinates.com/gdal-travisci/$(MRSID_DOWNLOAD) -O /tmp/$(MRSID_DOWNLOAD) \
 	&& touch -c /tmp/$(MRSID_DOWNLOAD)
 
-$(LIBKML_DEV): /tmp/$(LIBKML_DOWNLOAD)
-	tar -C /tmp -xzf /tmp/$(LIBKML_DOWNLOAD) \
-	&& cp -r /tmp/install-libkml/include/* /usr/local/include \
-	&& cp -r /tmp/install-libkml/lib/* /usr/local/lib
-/tmp/$(LIBKML_DOWNLOAD): $(WGET)
-	$(WGET) --no-verbose http://s3.amazonaws.com/etc-data.koordinates.com/gdal-travisci/$(LIBKML_DOWNLOAD) -O /tmp/$(LIBKML_DOWNLOAD) \
-	&& touch -c /tmp/$(LIBKML_DOWNLOAD)
-
 $(LIBKEA_DEV): /tmp/$(LIBKEA_DOWNLOAD) $(LIBHDF5_DEV) $(UNZIP) $(CMAKE)
 	$(UNZIP) -o -d /tmp /tmp/$(LIBKEA_DOWNLOAD) \
 	&& cd /tmp/chchrsc-kealib-$(LIBKEA_VERSION)/trunk \
@@ -163,7 +155,7 @@ $(LIBKEA_DEV): /tmp/$(LIBKEA_DOWNLOAD) $(LIBHDF5_DEV) $(UNZIP) $(CMAKE)
 	$(WGET) --no-verbose https://bitbucket.org/chchrsc/kealib/get/$(LIBKEA_DOWNLOAD) -O /tmp/$(LIBKEA_DOWNLOAD) \
 	&& touch -c /tmp/$(LIBKEA_DOWNLOAD)
 $(LIBHDF5_DEV): /tmp/apt-updated
-	apt-get install -y libhdf5-serial-dev && touch -c $(LIBHDF5_DEV)
+	apt-get install $(APT_INSTALL_OPTS) libhdf5-dev && touch -c $(LIBHDF5_DEV)
 
 $(MDBSQLITE_DEV): /tmp/$(MDBSQLITE_DOWNLOAD) $(JAVA)
 	tar -C /tmp -xjf /tmp/$(MDBSQLITE_DOWNLOAD) \
@@ -173,34 +165,34 @@ $(MDBSQLITE_DEV): /tmp/$(MDBSQLITE_DOWNLOAD) $(JAVA)
 	&& touch -c /tmp/$(MDBSQLITE_DOWNLOAD)
 
 $(JAVA): /tmp/apt-updated
-	apt-get install -y openjdk-7-jdk && touch -c $(JAVA)
+	apt-get install $(APT_INSTALL_OPTS) openjdk-7-jdk && touch -c $(JAVA)
 
 $(DEPS_DEV): /etc/apt/sources.list.d/ubuntugis-ubuntugis-unstable-trusty.list /etc/apt/sources.list.d/marlam-gta-trusty.list
-	apt-get install -y $(DEPS_PACKAGES) && touch -c $(DEPS_DEV)
+	apt-get install $(APT_INSTALL_OPTS) $(DEPS_PACKAGES) && touch -c $(DEPS_DEV)
 
 $(SVN): /tmp/apt-updated
-	apt-get install -y subversion && touch -c $(SVN)
+	apt-get install $(APT_INSTALL_OPTS) subversion && touch -c $(SVN)
 
 $(WGET): /tmp/apt-updated
-	apt-get install -y wget && touch -c $(WGET)
+	apt-get install $(APT_INSTALL_OPTS) wget && touch -c $(WGET)
 
 $(UNZIP): /tmp/apt-updated
-	apt-get install -y unzip && touch -c $(UNZIP)
+	apt-get install $(APT_INSTALL_OPTS) unzip && touch -c $(UNZIP)
 
 $(CMAKE): /tmp/apt-updated
-	apt-get install -y cmake && touch -c $(CMAKE)
+	apt-get install $(APT_INSTALL_OPTS) cmake && touch -c $(CMAKE)
 
 $(GIT): /tmp/apt-updated
-	apt-get install -y git && touch -c $(GIT)
+	apt-get install $(APT_INSTALL_OPTS) git && touch -c $(GIT)
 
 $(SCONS): /tmp/apt-updated
-	apt-get install -y scons && touch -c $(SCONS)
+	apt-get install $(APT_INSTALL_OPTS) scons && touch -c $(SCONS)
 
 $(ANT): /tmp/apt-updated
-	apt-get install -y ant && touch -c $(ANT)
+	apt-get install $(APT_INSTALL_OPTS) ant && touch -c $(ANT)
 
 $(BUILD_ESSENTIAL): /tmp/apt-updated
-	apt-get install -y build-essential \
+	apt-get install $(APT_INSTALL_OPTS) build-essential \
 	&& touch -c $(BUILD_ESSENTIAL)
 
 /etc/apt/sources.list.d/ubuntugis-ubuntugis-unstable-trusty.list: /usr/bin/add-apt-repository
@@ -210,7 +202,7 @@ $(BUILD_ESSENTIAL): /tmp/apt-updated
 	add-apt-repository -y ppa:marlam/gta && apt-get update -y
 
 $(ADD_APT_REPOSITORY): /tmp/apt-updated
-	apt-get install -y software-properties-common \
+	apt-get install $(APT_INSTALL_OPTS) software-properties-common \
 	&& touch -c $(ADD_APT_REPOSITORY)
 
 /tmp/apt-updated:
