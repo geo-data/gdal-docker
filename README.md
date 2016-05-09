@@ -41,7 +41,7 @@ you have a raster called `test.tif` in your current working directory on your
 host system, running the following command should invoke `gdalinfo` on
 `test.tif`:
 
-    docker run --rm -ti --volume $(pwd):/data geodata/gdal gdalinfo test.tif
+    docker run --rm -ti --volume $(pwd):/data geometalab/gdal-docker gdalinfo test.tif
 
 This works because the current working directory is set to `/data` in the
 container, and you have mapped the current working directory on your host to
