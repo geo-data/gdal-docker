@@ -28,6 +28,7 @@ LIBKEA_VERSION := c6d36f3db5e4
 LIBKEA_DOWNLOAD := $(LIBKEA_VERSION).zip
 MDBSQLITE_DIR := mdb-sqlite-1.0.2
 MDBSQLITE_DOWNLOAD := $(MDBSQLITE_DIR).tar.bz2
+MDBSQLITE_URL := https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/mdb-sqlite/
 
 # Dependencies satisfied by packages.
 DEPS_PACKAGES := python-numpy python-dev libpq-dev libpng12-dev libjpeg-dev libgif-dev liblzma-dev libgeos-dev libcurl4-gnutls-dev libproj-dev libxml2-dev libexpat-dev libxerces-c-dev libnetcdf-dev netcdf-bin libpoppler-dev libspatialite-dev gpsbabel swig libhdf4-alt-dev libpodofo-dev poppler-utils libfreexl-dev unixodbc-dev libwebp-dev libepsilon-dev libgta-dev liblcms2-2 libpcre3-dev
@@ -169,7 +170,7 @@ $(MDBSQLITE_DEV): /tmp/$(MDBSQLITE_DOWNLOAD) $(JAVA)
 	tar -C /tmp -xjf /tmp/$(MDBSQLITE_DOWNLOAD) \
 	&& cp /tmp/$(MDBSQLITE_DIR)/lib/*.jar $(JAVA)/jre/lib/ext
 /tmp/$(MDBSQLITE_DOWNLOAD): $(WGET)
-	$(WGET) --no-verbose http://mdb-sqlite.googlecode.com/files/$(MDBSQLITE_DOWNLOAD) -O /tmp/$(MDBSQLITE_DOWNLOAD) \
+	$(WGET) --no-verbose $(MDBSQLITE_URL)$(MDBSQLITE_DOWNLOAD) -O /tmp/$(MDBSQLITE_DOWNLOAD) \
 	&& touch -c /tmp/$(MDBSQLITE_DOWNLOAD)
 
 $(JAVA): /tmp/apt-updated
