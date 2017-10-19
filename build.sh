@@ -5,7 +5,7 @@
 #
 # This script is designed to be run from within a docker container in order to
 # install GDAL. It delegates to `before_install.sh` and `install.sh` which are
-# adapted from the Travis CI configuration in the GDAL repository.
+# patched from the Travis CI configuration in the GDAL repository.
 #
 
 set -e
@@ -23,22 +23,33 @@ export LANG
 
 # Instell prerequisites.
 apt-get update -y
-apt-get install -y software-properties-common wget unzip subversion ccache python-dev ant
+apt-get install -y \
+        software-properties-common \
+        wget \
+        unzip \
+        subversion \
+        ccache \
+        clang-3.5 \
+        patch \
+        python-dev \
+        ant
 
 # Everything happens under here.
 cd /tmp
 
-# Install dependencies. Adapted from
-# <https://github.com/OSGeo/gdal/blob/trunk/gdal/ci/travis/gcc48_stdcpp11/before_install.sh>.
-. ${DIR}/before_install.sh
-
 # Get GDAL.
 svn checkout --quiet "http://svn.osgeo.org/gdal/${GDAL_VERSION}/" /tmp/gdal/
 
-# Install GDAL.  Adapted from
-# <https://github.com/OSGeo/gdal/blob/trunk/gdal/ci/travis/gcc48_stdcpp11/install.sh>.
-cd gdal
-. ${DIR}/install.sh
+# Install GDAL.
+cd /tmp/gdal
+
+# Apply our build patches.
+patch ./gdal/ci/travis/trusty_clang/before_install.sh ${DIR}/before_install.sh.patch
+patch ./gdal/ci/travis/trusty_clang/install.sh ${DIR}/install.sh.patch
+
+# Do the build.
+. ./gdal/ci/travis/trusty_clang/before_install.sh
+. ./gdal/ci/travis/trusty_clang/install.sh
 
 # Clean up.
 apt-get autoremove -y
