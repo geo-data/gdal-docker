@@ -15,24 +15,24 @@ GDAL_VERSION=$(cat ${DIR}/gdal-checkout.txt)
 
 export DEBIAN_FRONTEND=noninteractive
 
-# Set the locale. Required for subversion to work on the repository.
-update-locale LANG="C.UTF-8"
-dpkg-reconfigure locales
-. /etc/default/locale
-export LANG
-
 # Instell prerequisites.
 apt-get update -y
 apt-get install -y \
+        subversion \
+        sudo \
+        make \
+        ccache \
         software-properties-common \
         wget \
         unzip \
-        subversion \
-        ccache \
-        clang-3.5 \
-        patch \
-        python-dev \
-        ant
+        build-essential
+
+# Set the locale. Required for subversion to work on the repository.
+export LANG="C.UTF-8"
+apt-get install -y locales
+update-locale LANG=$LANG
+dpkg-reconfigure locales
+. /etc/default/locale
 
 # Everything happens under here.
 cd /tmp
@@ -40,16 +40,28 @@ cd /tmp
 # Get GDAL.
 svn checkout --quiet "http://svn.osgeo.org/gdal/${GDAL_VERSION}/" /tmp/gdal/
 
+# Apply our build patches.
+cd /tmp/gdal
+svn patch ${DIR}/before_install.sh.patch
+svn patch ${DIR}/install.sh.patch
+
+# Install prerequisites.
+yes | sh ./gdal/ci/travis/gcc48_stdcpp11/before_install.sh
+
+# Upgrade curl to support HTTP/2.
+apt-get purge -y libcurl4-gnutls-dev libcurl3-gnutls libnetcdf-dev netcdf-bin
+apt-get install -y nghttp2 libnghttp2-dev
+wget https://curl.haxx.se/download/curl-7.56.0.tar.bz2
+tar -xvjf curl-7.56.0.tar.bz2
+cd curl-7.56.0
+./configure  --with-ssl --with-nghttp2 --prefix=/usr/local
+make -j$(nproc)
+make install
+ldconfig
+
 # Install GDAL.
 cd /tmp/gdal
-
-# Apply our build patches.
-patch ./gdal/ci/travis/trusty_clang/before_install.sh ${DIR}/before_install.sh.patch
-patch ./gdal/ci/travis/trusty_clang/install.sh ${DIR}/install.sh.patch
-
-# Do the build.
-. ./gdal/ci/travis/trusty_clang/before_install.sh
-. ./gdal/ci/travis/trusty_clang/install.sh
+bash ./gdal/ci/travis/gcc48_stdcpp11/install.sh
 
 # Clean up.
 apt-get autoremove -y
