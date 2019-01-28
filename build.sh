@@ -21,7 +21,7 @@ dpkg-reconfigure locales
 . /etc/default/locale
 export LANG
 
-# Instell prerequisites.
+# Install prerequisites.
 apt-get update -y
 apt-get install -y \
         software-properties-common \
