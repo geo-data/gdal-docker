@@ -21,7 +21,7 @@ docker run --rm -ti geometalab/gdal-docker
 ```
 will output something like:
 ```
-GDAL 2.2.0dev, released 2016/99/99
+GDAL 3.1.0dev, released 2016/99/99
 Supported Formats:
   VRT -raster- (rw+v): Virtual Raster
   GTiff -raster- (rw+vs): GeoTIFF
@@ -56,3 +56,27 @@ time the image was built*. If you want to include the most up-to-date commits
 then you need to build the docker image yourself locally along these lines:
 
     docker build -t geometalab/gdal-docker:local git://github.com/geometalab/gdal-docker.git
+
+## Building images
+
+Only works starting with `v3.0.0`, build seems broken with lower versions.
+
+### master branch
+
+```bash
+docker build -t geometalab/gdal-docker:latest -f Dockerfile .
+```
+
+### A specific version (release)
+
+```bash
+export VERSION=2.4
+docker build --pull --build-arg GDAL_VERSION=release/${VERSION} --build-arg --build-arg GDAL_BUILD_IS_RELEASE=x -t geometalab/gdal-docker:${VERSION} -f Dockerfile .
+```
+
+### A specific version (downloadable release, like v3.0.0)
+
+```bash
+export VERSION=v3.0.0
+docker build --pull --build-arg GDAL_VERSION=${VERSION} --build-arg GDAL_BUILD_IS_RELEASE=x -t geometalab/gdal-docker:${VERSION} -f Dockerfile .
+```

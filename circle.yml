@@ -24,3 +24,6 @@ deployment:
       - docker push geometalab/gdal-docker
       - docker tag geometalab/gdal-docker geometalab/gdal-docker:$(docker run -it --rm geometalab/gdal-docker ogrinfo --version | sed -nr 's/^GDAL\s+([^,]+).*$/\1/p' | tr -d '\n')
       - docker push geometalab/gdal-docker:$(docker run -it --rm geometalab/gdal-docker ogrinfo --version | sed -nr 's/^GDAL\s+([^,]+).*$/\1/p' | tr -d '\n')
+      # also release a version 3.0.0
+      - docker build --pull --build-arg GDAL_VERSION=v3.0.0 --build-arg GDAL_BUILD_IS_RELEASE=x -t geometalab/gdal-docker:v3.0.0 -f Dockerfile .
+      - docker push geometalab/gdal-docker:v3.0.0
