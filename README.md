@@ -67,16 +67,38 @@ Only works starting with `v3.0.0`, build seems broken with lower versions.
 docker build -t geometalab/gdal-docker:latest -f Dockerfile .
 ```
 
-### A specific version (release)
-
-```bash
-export VERSION=2.4
-docker build --pull --build-arg GDAL_VERSION=release/${VERSION} --build-arg --build-arg GDAL_BUILD_IS_RELEASE=x -t geometalab/gdal-docker:${VERSION} -f Dockerfile .
-```
-
 ### A specific version (downloadable release, like v3.0.0)
 
 ```bash
 export VERSION=v3.0.0
 docker build --pull --build-arg GDAL_VERSION=${VERSION} --build-arg GDAL_BUILD_IS_RELEASE=x -t geometalab/gdal-docker:${VERSION} -f Dockerfile .
 ```
+
+## Building simplified with docker-compose
+
+Useful for example experimenting with builds (ie. different python versions).
+
+If you build very often, ie. to try a new version, you
+might profit from using docker-compose with the `docker-compose.yml` 
+to build different stages to try out, inspect and review as needed
+before building the entire image.
+
+ie. 
+
+```bash
+export GDAL_VERSION=v3.0.0
+docker-compose build --pull gdal-builder
+# look around in the image
+docker-compose run --rm gdal-builder bash
+
+# adapt Dockerfile if needed and build your new image
+docker-compose build --pull gdal-docker
+
+# test your build with very basic tests
+docker-compose up --build tests
+
+# maybe even push the newly built image
+docker-compose push gdal-docker
+```
+
+

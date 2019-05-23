@@ -1,0 +1,27 @@
+version: '3.7'
+services:
+  gdal-builder:
+    image: gdal-builder:${GDAL_VERSION:-latest}
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: builder
+      args: &args
+        GDAL_VERSION: ${GDAL_VERSION:-master}
+        GDAL_BUILD_IS_RELEASE: "x"
+
+  gdal-docker:
+    image: geometalab/gdal-docker:${GDAL_VERSION:-latest}
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        <<: *args
+  tests:
+    build:
+      context: .
+      dockerfile: tests.dockerfile
+      args:
+        <<: *args
+    volumes:
+      - ./tests/:/tmp/tests/

@@ -235,7 +235,7 @@ RUN mkdir -p /build_gdal_python/usr/lib \
     && mv /build/usr/bin/*.py               /build_gdal_python/usr/bin \
     && mv /build/usr/bin                    /build_gdal_version_changing/usr \
     && for i in /build_gdal_version_changing/usr/lib/*; do strip -s $i 2>/dev/null || /bin/true; done \
-    && for i in /build_gdal_python/usr/lib/python2.7/dist-packages/osgeo/*.so; do strip -s $i 2>/dev/null || /bin/true; done \
+    && for i in /build_gdal_python/usr/lib/python3/dist-packages/osgeo/*.so; do strip -s $i 2>/dev/null || /bin/true; done \
     && for i in /build_gdal_version_changing/usr/bin/*; do strip -s $i 2>/dev/null || /bin/true; done
 
 # Build final image
@@ -251,7 +251,7 @@ RUN apt-get update; \
 
 # GDAL dependencies
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y \
-        libcharls1 libopenjp2-7 libcairo2 python-numpy \
+        libcharls1 libopenjp2-7 libcairo2 python3-numpy \
         libpng16-16 libjpeg-turbo8 libgif7 liblzma5 libgeos-3.6.2 libgeos-c1v5 \
         libcurl4 libxml2 libexpat1 \
         libxerces-c3.2 libnetcdf-c++4 netcdf-bin libpoppler73 libspatialite7 gpsbabel \
@@ -260,7 +260,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -y \
         libkmlbase1 libkmlconvenience1 libkmldom1 libkmlengine1 libkmlregionator1 libkmlxsd1 \
         libmysqlclient20 libogdi3.2 libcfitsio5 openjdk-8-jre \
         libzstd1 bash bash-completion libpq5 libssl1.1 \
-        libarmadillo8 python3 python3-dev
+        libarmadillo8 python3 python3-dev python3-pip
 
 # Order layers starting with less frequently varying ones
 ARG PROJ_DATUMGRID_LATEST_LAST_MODIFIED
@@ -290,6 +290,8 @@ COPY --from=builder  /build/usr/share/gdal/ /usr/share/gdal/
 COPY --from=builder  /build/usr/include/ /usr/include/
 COPY --from=builder  /build_gdal_python/usr/ /usr/
 COPY --from=builder  /build_gdal_version_changing/usr/ /usr/
+
+# COPY --from=builder  /opt/FileGDB_API-64gcc51 /opt/
 
 # Add FileGDB Support - copy from builder didn't work
 RUN apt-get install -y wget && mkdir -p /opt \
